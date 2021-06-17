@@ -7,7 +7,7 @@
     tools:context=".MainActivity">
 
     <ImageView
-        android:id="@+id/imageView"
+        android:id="@+id/imageViewHangman"
         android:layout_width="291dp"
         android:layout_height="289dp"
         android:layout_marginTop="72dp"
@@ -17,20 +17,19 @@
         app:srcCompat="@android:drawable/sym_def_app_icon" />
 
     <TextView
-        android:id="@+id/textView"
+        android:id="@+id/textViewWord"
         android:layout_width="308dp"
         android:layout_height="38dp"
         android:layout_marginBottom="100dp"
-        android:text="________"
         android:textAlignment="center"
         android:textSize="35dp"
-        app:layout_constraintBottom_toTopOf="@+id/linearLayout"
+        app:layout_constraintBottom_toTopOf="@+id/layoutKeyboard"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.495"
         app:layout_constraintStart_toStartOf="parent" />
 
     <LinearLayout
-        android:id="@+id/linearLayout"
+        android:id="@+id/layoutKeyboard"
         android:layout_width="372dp"
         android:layout_height="129dp"
         android:layout_marginBottom="44dp"
@@ -46,7 +45,7 @@
             android:orientation="horizontal">
 
             <Button
-                android:id="@+id/button2"
+                android:id="@+id/buttonA"
                 android:layout_width="40dp"
                 android:layout_height="40dp"
                 android:insetTop="0dp"
@@ -58,7 +57,7 @@
                 android:text="A" />
 
             <Button
-                android:id="@+id/button9"
+                android:id="@+id/buttonB"
                 android:layout_width="40dp"
                 android:layout_height="40dp"
                 android:insetTop="0dp"
@@ -70,7 +69,7 @@
                 android:text="B" />
 
             <Button
-                android:id="@+id/button10"
+                android:id="@+id/buttonC"
                 android:layout_width="40dp"
                 android:layout_height="40dp"
                 android:insetTop="0dp"
@@ -82,7 +81,7 @@
                 android:text="C" />
 
             <Button
-                android:id="@+id/button11"
+                android:id="@+id/buttonD"
                 android:layout_width="40dp"
                 android:layout_height="40dp"
                 android:insetTop="0dp"
@@ -94,7 +93,7 @@
                 android:text="D" />
 
             <Button
-                android:id="@+id/button12"
+                android:id="@+id/buttonE"
                 android:layout_width="40dp"
                 android:layout_height="40dp"
                 android:insetTop="0dp"
@@ -106,7 +105,7 @@
                 android:text="E" />
 
             <Button
-                android:id="@+id/button13"
+                android:id="@+id/buttonF"
                 android:layout_width="40dp"
                 android:layout_height="40dp"
                 android:insetTop="0dp"
@@ -118,7 +117,7 @@
                 android:text="F" />
 
             <Button
-                android:id="@+id/button14"
+                android:id="@+id/buttonG"
                 android:layout_width="40dp"
                 android:layout_height="40dp"
                 android:insetTop="0dp"
@@ -130,7 +129,7 @@
                 android:text="G" />
 
             <Button
-                android:id="@+id/button15"
+                android:id="@+id/buttonH"
                 android:layout_width="40dp"
                 android:layout_height="40dp"
                 android:insetTop="0dp"
@@ -142,7 +141,7 @@
                 android:text="H" />
 
             <Button
-                android:id="@+id/button16"
+                android:id="@+id/buttonI"
                 android:layout_width="40dp"
                 android:layout_height="40dp"
                 android:insetTop="0dp"
@@ -160,7 +159,7 @@
             android:orientation="horizontal">
 
             <Button
-                android:id="@+id/button22"
+                android:id="@+id/buttonJ"
                 android:layout_width="40dp"
                 android:layout_height="40dp"
                 android:insetTop="0dp"
@@ -172,7 +171,7 @@
                 android:text="J" />
 
             <Button
-                android:id="@+id/button23"
+                android:id="@+id/buttonK"
                 android:layout_width="40dp"
                 android:layout_height="40dp"
                 android:insetTop="0dp"
@@ -184,7 +183,7 @@
                 android:text="K" />
 
             <Button
-                android:id="@+id/button25"
+                android:id="@+id/buttonL"
                 android:layout_width="40dp"
                 android:layout_height="40dp"
                 android:insetTop="0dp"
@@ -196,7 +195,7 @@
                 android:text="L" />
 
             <Button
-                android:id="@+id/button19"
+                android:id="@+id/buttonM"
                 android:layout_width="40dp"
                 android:layout_height="40dp"
                 android:insetTop="0dp"
@@ -208,7 +207,7 @@
                 android:text="M" />
 
             <Button
-                android:id="@+id/button20"
+                android:id="@+id/buttonN"
                 android:layout_width="40dp"
                 android:layout_height="40dp"
                 android:insetTop="0dp"
@@ -220,7 +219,7 @@
                 android:text="N" />
 
             <Button
-                android:id="@+id/button24"
+                android:id="@+id/buttonO"
                 android:layout_width="40dp"
                 android:layout_height="40dp"
                 android:insetTop="0dp"
@@ -232,7 +231,7 @@
                 android:text="O" />
 
             <Button
-                android:id="@+id/button21"
+                android:id="@+id/buttonP"
                 android:layout_width="40dp"
                 android:layout_height="40dp"
                 android:insetTop="0dp"
@@ -244,7 +243,7 @@
                 android:text="P" />
 
             <Button
-                android:id="@+id/button36"
+                android:id="@+id/buttonQ"
                 android:layout_width="40dp"
                 android:layout_height="40dp"
                 android:insetTop="0dp"
@@ -256,7 +255,7 @@
                 android:text="Q" />
 
             <Button
-                android:id="@+id/button18"
+                android:id="@+id/buttonR"
                 android:layout_width="40dp"
                 android:layout_height="40dp"
                 android:insetTop="0dp"
@@ -275,7 +274,7 @@
             android:orientation="horizontal">
 
             <Button
-                android:id="@+id/button26"
+                android:id="@+id/buttonS"
                 android:layout_width="40dp"
                 android:layout_height="40dp"
                 android:insetTop="0dp"
@@ -287,7 +286,7 @@
                 android:text="S" />
 
             <Button
-                android:id="@+id/button31"
+                android:id="@+id/buttonT"
                 android:layout_width="40dp"
                 android:layout_height="40dp"
                 android:insetTop="0dp"
@@ -299,7 +298,7 @@
                 android:text="T" />
 
             <Button
-                android:id="@+id/button32"
+                android:id="@+id/buttonU"
                 android:layout_width="40dp"
                 android:layout_height="40dp"
                 android:insetTop="0dp"
@@ -311,7 +310,7 @@
                 android:text="U" />
 
             <Button
-                android:id="@+id/button34"
+                android:id="@+id/buttonV"
                 android:layout_width="40dp"
                 android:layout_height="40dp"
                 android:insetTop="0dp"
@@ -323,7 +322,7 @@
                 android:text="V" />
 
             <Button
-                android:id="@+id/button28"
+                android:id="@+id/buttonW"
                 android:layout_width="40dp"
                 android:layout_height="40dp"
                 android:insetTop="0dp"
@@ -335,7 +334,7 @@
                 android:text="W" />
 
             <Button
-                android:id="@+id/button29"
+                android:id="@+id/buttonX"
                 android:layout_width="40dp"
                 android:layout_height="40dp"
                 android:insetTop="0dp"
@@ -347,7 +346,7 @@
                 android:text="X" />
 
             <Button
-                android:id="@+id/button33"
+                android:id="@+id/buttonY"
                 android:layout_width="40dp"
                 android:layout_height="40dp"
                 android:insetTop="0dp"
@@ -359,7 +358,7 @@
                 android:text="Y" />
 
             <Button
-                android:id="@+id/button30"
+                android:id="@+id/buttonZ"
                 android:layout_width="40dp"
                 android:layout_height="40dp"
                 android:insetTop="0dp"
