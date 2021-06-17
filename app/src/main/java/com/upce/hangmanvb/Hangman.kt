@@ -4,7 +4,7 @@ import android.widget.ImageView
 import android.widget.TextView
 
 class Hangman(private val word: String) {
-    var lives: Int = 6
+    var lives: Int = 7
     var guessedArray = BooleanArray(word.length) { _ -> false }
 
     fun render(imgView: ImageView, textView: TextView) {
