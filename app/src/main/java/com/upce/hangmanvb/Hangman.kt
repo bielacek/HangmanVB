@@ -3,7 +3,8 @@ package com.upce.hangmanvb
 import android.widget.ImageView
 import android.widget.TextView
 
-class Hangman(val word: String, val lives: Int) {
+class Hangman(private val word: String) {
+    var lives: Int = 6
     var guessedArray = BooleanArray(word.length) { _ -> false }
 
     fun render(imgView: ImageView, textView: TextView) {
@@ -21,6 +22,7 @@ class Hangman(val word: String, val lives: Int) {
                 if (!letterGuessed) letterGuessed = true
             }
         }
+        if (!letterGuessed) lives--
     }
 
     private fun getTextForTextView(): String {
