@@ -1,59 +1,56 @@
 package com.upce.hangmanvb
 
-import android.widget.ImageView
-import android.widget.TextView
-import android.widget.Toast
-
-class Hangman(private var word: String) {
-    val livesMax: Int = 6
+class Hangman(var word: String) {
+    private val livesMax: Int = 6
+    private var guessedArray = BooleanArray(word.length) { _ -> false }
     var lives: Int = livesMax
-    var guessedArray = BooleanArray(word.length) { _ -> false }
 
-    fun render(imgView: ImageView?, textView: TextView) {
-        //TODO nakopírovat obrázky a nastavit metodu aby vykreslila příslušný dle počtu životů
-        textView.text = getTextForTextView()
-        when (lives) {
-            6 -> imgView?.setBackgroundResource(R.drawable.lives6)
-            5 -> imgView?.setBackgroundResource(R.drawable.lives5)
-            4 -> imgView?.setBackgroundResource(R.drawable.lives4)
-            3 -> imgView?.setBackgroundResource(R.drawable.lives3)
-            2 -> imgView?.setBackgroundResource(R.drawable.lives2)
-            1 -> imgView?.setBackgroundResource(R.drawable.lives1)
-            0 -> imgView?.setBackgroundResource(R.drawable.lives0)
-
-        }
-    }
-
-    fun newWord(word: String) {
+    /**
+     * Resetuje atributy třídy a nahradí původníá slovo za nové
+     */
+    fun reset(word: String) {
         this.word = word
         lives = livesMax
         guessedArray = BooleanArray(word.length) { _ -> false }
-
     }
 
+    /**
+     * Hádání písmena/písmen ve slově
+     */
     fun guess(vararg letter: Char) {
         var letterGuessed = false
         for (i in word.indices) {
             for (j in letter.indices) {
-                if (word[i].toLowerCase() == letter[j].toLowerCase()) {
+                if (word[i].equals(letter[j], ignoreCase = true)) {
                     guessedArray[i] = true
                     if (!letterGuessed) letterGuessed = true
                 }
             }
         }
         if (!letterGuessed) lives--
-        if (lives == 0) {
-            //TODO game over
-        }
     }
 
-    private fun getTextForTextView(): String {
+    /**
+     * Vrací true, pokud je slovo kompletně uhodnuto, jinak false
+     */
+    fun wordCompleted(): Boolean {
+        for (i in guessedArray.indices) {
+            if (!guessedArray[i]) return false
+        }
+        return true
+    }
+
+    /**
+     * Vrací formátovaný text pro zobrazení např. v TextView
+     * Každé neuhodnuté písmeno je nahrazeno písmenem v parametru
+     */
+    fun getWordFormated(ch: Char): String {
         var text = ""
         for (i in guessedArray.indices) {
-            if (guessedArray[i]) {
-                text += word[i] + " "
+            text += if (guessedArray[i]) {
+                word[i].toLowerCase() + " "
             } else {
-                text += "_ "
+                "$ch "
             }
         }
         return text
