@@ -1,6 +1,7 @@
 package com.upce.hangmanvb
 
 import android.content.DialogInterface
+import android.graphics.Color
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.widget.*
@@ -20,10 +21,10 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         setButtonListeners()
-        hangman.reset("tkanička")
+        textViewWord.setTextColor(Color.parseColor("black"));
         builder = AlertDialog.Builder(this)
         with(builder) {
-            setMessage("Slovo bylo \"${hangman.word}\"")
+            setMessage("Slovo bylo \"${hangman.word.toUpperCase()}\"")
             setCancelable(false)
             val positiveButtonClick = { _: DialogInterface, _: Int ->
                 reset()

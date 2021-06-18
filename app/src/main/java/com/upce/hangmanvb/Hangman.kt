@@ -48,7 +48,7 @@ class Hangman(var word: String) {
         var text = ""
         for (i in guessedArray.indices) {
             text += if (guessedArray[i]) {
-                word[i].toLowerCase() + " "
+                word[i].toUpperCase() + " "
             } else {
                 "$ch "
             }
