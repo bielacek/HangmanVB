@@ -11,10 +11,7 @@ class Hangman(private var word: String) {
 
     fun render(imgView: ImageView?, textView: TextView) {
         //TODO nakopírovat obrázky a nastavit metodu aby vykreslila příslušný dle počtu životů
-        //Vygenerovat obrázek
-        //imgView.setImageResource()
-        //Vygenerovat uhádnutá písmena
-        textView.setText(getTextForTextView() + " - ${lives}")
+        textView.text = getTextForTextView()
         when (lives) {
             6 -> imgView?.setBackgroundResource(R.drawable.lives6)
             5 -> imgView?.setBackgroundResource(R.drawable.lives5)
@@ -46,13 +43,13 @@ class Hangman(private var word: String) {
         }
         if (!letterGuessed) lives--
         if (lives == 0) {
-            // game over
+            //TODO game over
         }
     }
 
     private fun getTextForTextView(): String {
         var text = ""
-        for (i in 0..guessedArray.size - 1) {
+        for (i in guessedArray.indices) {
             if (guessedArray[i]) {
                 text += word[i] + " "
             } else {
