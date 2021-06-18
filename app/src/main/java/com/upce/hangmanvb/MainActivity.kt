@@ -3,6 +3,7 @@ package com.upce.hangmanvb
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.widget.*
+import java.io.File
 
 class MainActivity : AppCompatActivity() {
 
@@ -20,9 +21,30 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         setButtonsListeners()
+
+
+        // random tryouts
+        // file reading
+        //readFile('')
+        // db connection
+        val context = this
+        findViewById<Button>(R.id.buttonInsert).setOnClickListener {
+            if(findViewById<EditText>(R.id.editTextWord).text.toString().length > 0){
+                var db = DatabaseHandler(context)
+                //db.insertData(findViewById<EditText>(R.id.editTextWord).text.toString())
+                db.insertData("ahoj")
+                //Toast.makeText(context, db.toString(), Toast.LENGTH_LONG).show()
+            }else{
+                Toast.makeText(context, "Vypln pole pro slovo", Toast.LENGTH_SHORT).show()
+            }
+
+        }
+
+
         reset()
     }
-
+    private fun readFile(fileName: String): List<String>
+            = File(fileName).useLines { it.toList() }
     private fun btnHandler(btn: Button) {
         hangman.render(imageViewHangman, textViewWord)
         btn.isEnabled = false
@@ -33,7 +55,6 @@ class MainActivity : AppCompatActivity() {
     fun reset() {
         Toast.makeText(applicationContext, "reset", Toast.LENGTH_SHORT).show()
         hangman.newWord("tkanička")
-
     }
 
     private fun setButtonsListeners(){
