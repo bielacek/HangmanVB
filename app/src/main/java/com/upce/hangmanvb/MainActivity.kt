@@ -15,6 +15,7 @@ class MainActivity : AppCompatActivity() {
     //TODO Skóre?
     //TODO Uživatel může přidat slovo do databáze
     //TODO Napojit na databázi (přidat do databáze slova z .txt)
+    // - databáze by byla, ale to čtení z txt ne
     var hangman: Hangman = Hangman("Analfabet")
 
     //TODO Nakopírovat pro ostatní buttony + změnit písmena v guess
@@ -23,27 +24,39 @@ class MainActivity : AppCompatActivity() {
     private val layoutKeyboard by lazy { findViewById<LinearLayout>(R.id.layoutKeyboard) }
     private lateinit var builder: AlertDialog.Builder
 
+    val context = this
+    var db = DatabaseHandler(context)
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
         setButtonListeners()
-        /*
+
         // db connection
-        val context = this
+
         findViewById<Button>(R.id.buttonInsert).setOnClickListener {
             if(findViewById<EditText>(R.id.editTextWord).text.toString().length > 0){
-                var db = DatabaseHandler(context)
-                //db.insertData(findViewById<EditText>(R.id.editTextWord).text.toString())
-                db.insertData("ahoj")
-                //Toast.makeText(context, db.toString(), Toast.LENGTH_LONG).show()
+                db.insertData(findViewById<EditText>(R.id.editTextWord).text.toString())
             }else{
                 Toast.makeText(context, "Vypln pole pro slovo", Toast.LENGTH_SHORT).show()
             }
-
+            var data = db.readData()
+            findViewById<TextView>(R.id.textViewResult).setText("")
+            for(i in 0 until data.size){
+                findViewById<TextView>(R.id.textViewResult).append(data.get(i)+"\n")
+            }
+        }
+        findViewById<Button>(R.id.buttonDelete).setOnClickListener{
+            Toast.makeText(context, "delete", Toast.LENGTH_SHORT).show()
+            db.deleteLast()
+            var data = db.readData()
+            findViewById<TextView>(R.id.textViewResult).setText("")
+            for(i in 0 until data.size){
+                findViewById<TextView>(R.id.textViewResult).append(data.get(i)+"\n")
+            }
         }
 
 
-        */
 
         textViewWord.setTextColor(Color.parseColor("black"));
         builder = AlertDialog.Builder(this)
@@ -73,7 +86,9 @@ class MainActivity : AppCompatActivity() {
     private fun reset() {
         Toast.makeText(applicationContext, "Hra byla restartována", Toast.LENGTH_SHORT).show()
         //TODO Změnit na náhodné slovo z databáze
-        hangman.reset("tkanička")
+        val wordtemp = db.getRandom()
+
+        hangman.reset(wordtemp)
         render(imageViewHangman, textViewWord)
         layoutKeyboard.forEach { child ->
             (child as LinearLayout).forEach { btn ->
