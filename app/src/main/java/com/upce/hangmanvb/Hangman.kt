@@ -1,6 +1,6 @@
 package com.upce.hangmanvb
 
-class Hangman(var word: String) {
+class Hangman( var word: String) {
     private val livesMax: Int = 6
     private var guessedArray = BooleanArray(word.length) { _ -> false }
     var lives: Int = livesMax
