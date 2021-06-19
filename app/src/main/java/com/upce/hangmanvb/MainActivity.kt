@@ -7,14 +7,10 @@ import android.widget.*
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.forEach
-import java.io.BufferedReader
-import java.io.File
-import java.io.InputStream
-import java.io.InputStreamReader
 import java.util.*
 
 class MainActivity : AppCompatActivity() {
-    lateinit var hangman: Hangman
+    private lateinit var hangman: Hangman
     private val textViewWord by lazy { findViewById<TextView>(R.id.textViewWord) }
     private val textViewEdit by lazy { findViewById<TextView>(R.id.editTextWord) }
     private val imageViewHangman by lazy { findViewById<ImageView>(R.id.imageViewHangman) }
@@ -22,7 +18,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var builder: AlertDialog.Builder
 
     private val context = this
-    var db = DatabaseHandler(context)
+    private var db = DatabaseHandler(context)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -157,7 +153,7 @@ class MainActivity : AppCompatActivity() {
         findViewById<ImageButton>(R.id.buttonReset).setOnClickListener {
             reset()
         }
-        setListener(findViewById<Button>(R.id.buttonA), 'a', 'á')
+        setListener(findViewById(R.id.buttonA), 'a', 'á')
         setListener(findViewById(R.id.buttonB), 'b')
         setListener(findViewById(R.id.buttonC), 'c', 'č')
         setListener(findViewById(R.id.buttonD), 'd', 'ď')
