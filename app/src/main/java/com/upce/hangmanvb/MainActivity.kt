@@ -2,29 +2,26 @@ package com.upce.hangmanvb
 
 import android.content.DialogInterface
 import android.graphics.Color
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.widget.*
-import java.io.File
 import androidx.appcompat.app.AlertDialog
+import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.forEach
+import java.io.BufferedReader
+import java.io.File
+import java.io.InputStream
+import java.io.InputStreamReader
+import java.util.*
 
 class MainActivity : AppCompatActivity() {
-
-    //TODO Reset hry - ikona hotova
-    //TODO Skóre?
-    //TODO Uživatel může přidat slovo do databáze
-    //TODO Napojit na databázi (přidat do databáze slova z .txt)
-    // - databáze by byla, ale to čtení z txt ne
-    var hangman: Hangman = Hangman("Analfabet")
-
-    //TODO Nakopírovat pro ostatní buttony + změnit písmena v guess
+    lateinit var hangman: Hangman
     private val textViewWord by lazy { findViewById<TextView>(R.id.textViewWord) }
+    private val textViewEdit by lazy { findViewById<TextView>(R.id.editTextWord) }
     private val imageViewHangman by lazy { findViewById<ImageView>(R.id.imageViewHangman) }
     private val layoutKeyboard by lazy { findViewById<LinearLayout>(R.id.layoutKeyboard) }
     private lateinit var builder: AlertDialog.Builder
 
-    val context = this
+    private val context = this
     var db = DatabaseHandler(context)
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -32,36 +29,57 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
         setButtonListeners()
 
-        // db connection
-
+        // Tlačítko na odeslání dat do db
         findViewById<Button>(R.id.buttonInsert).setOnClickListener {
-            if(findViewById<EditText>(R.id.editTextWord).text.toString().length > 0){
-                db.insertData(findViewById<EditText>(R.id.editTextWord).text.toString())
-            }else{
-                Toast.makeText(context, "Vypln pole pro slovo", Toast.LENGTH_SHORT).show()
+            val text = textViewEdit.text.toString().trim().replace("\\s+".toRegex(), " ")
+            if (text.isNotEmpty() && text.length < 35) {
+                db.delete(text)
+                db.insertData(text)
+                textViewEdit.text = ""
+            } else {
+                Toast.makeText(context, "Slovo se nepodařilo přidat", Toast.LENGTH_SHORT).show()
             }
-            var data = db.readData()
-            findViewById<TextView>(R.id.textViewResult).setText("")
-            for(i in 0 until data.size){
-                findViewById<TextView>(R.id.textViewResult).append(data.get(i)+"\n")
-            }
-        }
-        findViewById<Button>(R.id.buttonDelete).setOnClickListener{
-            Toast.makeText(context, "delete", Toast.LENGTH_SHORT).show()
-            db.deleteLast()
-            var data = db.readData()
-            findViewById<TextView>(R.id.textViewResult).setText("")
-            for(i in 0 until data.size){
-                findViewById<TextView>(R.id.textViewResult).append(data.get(i)+"\n")
-            }
+            showData()
         }
 
+        //Tlačítko na smazání dat z db - pokud je textView prázdné, smaže se poslední vložený řádek
+        findViewById<Button>(R.id.buttonDelete).setOnClickListener {
+            val text = textViewEdit.text.toString().trim().replace("\\s+".toRegex(), " ")
+            if (text.isNotEmpty()) {
+                val result = db.delete(text)
+                if (result > 0) {
+                    Toast.makeText(context, "Smazáno $result řádků", Toast.LENGTH_SHORT).show()
+                    textViewEdit.text = ""
+                } else {
+                    Toast.makeText(context, "Data nenalezena", Toast.LENGTH_SHORT).show()
+                }
+            } else {
+                db.deleteLast()
+            }
+            showData()
+        }
+
+        // Vložení slov do databáze, pokud je databáze prázdná
+        //if(db.getRandom().isEmpty()){
+        //    val filePath = "podstatna_jmena.txt"
+        //    File(filePath).forEachLine { db.insertData(it) }
+        //}
 
 
-        textViewWord.setTextColor(Color.parseColor("black"));
+        //Inicializace třídy hangman
+        val wordtemp = db.getRandom()
+        hangman = if (wordtemp.isNotEmpty()) {
+            Hangman(wordtemp)
+        } else {
+            Hangman("slovo")
+        }
+
+        // Změna barvy textu
+        textViewWord.setTextColor(Color.parseColor("black"))
+
+        // Nastavení dialogu při výhře/prohře
         builder = AlertDialog.Builder(this)
         with(builder) {
-            setMessage("Slovo bylo \"${hangman.word.toUpperCase()}\"")
             setCancelable(false)
             val positiveButtonClick = { _: DialogInterface, _: Int ->
                 reset()
@@ -71,30 +89,37 @@ class MainActivity : AppCompatActivity() {
                 DialogInterface.OnClickListener(function = positiveButtonClick)
             )
         }
-    }
-    private fun readFile(fileName: String): List<String>
-            = File(fileName).useLines { it.toList() }
-    private fun btnHandler(btn: Button) {
         render(imageViewHangman, textViewWord)
-        btn.isEnabled = false
-        btn.background.alpha = 0
+        showData()
     }
+
+    private fun showData() {
+        val data = db.readData()
+        findViewById<TextView>(R.id.textViewResult).text = ""
+        for (i in 0 until data.size) {
+            findViewById<TextView>(R.id.textViewResult).append(data[i] + "\n")
+        }
+    }
+
 
     /**
      * Resetování hry a obnovení vypnutých tlačítek
      */
     private fun reset() {
         Toast.makeText(applicationContext, "Hra byla restartována", Toast.LENGTH_SHORT).show()
-        //TODO Změnit na náhodné slovo z databáze
         val wordtemp = db.getRandom()
-
-        hangman.reset(wordtemp)
-        render(imageViewHangman, textViewWord)
-        layoutKeyboard.forEach { child ->
-            (child as LinearLayout).forEach { btn ->
-                btn.background.alpha = 255
-                btn.isEnabled = true
+        if (wordtemp.isNotEmpty()) {
+            hangman.reset(wordtemp)
+            render(imageViewHangman, textViewWord)
+            layoutKeyboard.forEach { child ->
+                (child as LinearLayout).forEach { btn ->
+                    btn.background.alpha = 255
+                    btn.isEnabled = true
+                }
             }
+        } else {
+            Toast.makeText(applicationContext, "Databáze slov je prázdná", Toast.LENGTH_SHORT)
+                .show()
         }
     }
 
@@ -105,6 +130,7 @@ class MainActivity : AppCompatActivity() {
         textView.text = hangman.getWordFormated('_')
         if (hangman.wordCompleted()) {
             builder.setTitle("Výhra")
+            builder.setMessage("Správně bylo \"${hangman.word.toUpperCase(Locale.ROOT)}\"")
             builder.show()
         } else {
             when (hangman.lives) {
@@ -117,6 +143,7 @@ class MainActivity : AppCompatActivity() {
                 0 -> {
                     imgView.setBackgroundResource(R.drawable.lives0)
                     builder.setTitle("Prohra")
+                    builder.setMessage("Správně bylo \"${hangman.word.toUpperCase(Locale.ROOT)}\"")
                     builder.show()
                 }
             }
@@ -130,109 +157,44 @@ class MainActivity : AppCompatActivity() {
         findViewById<ImageButton>(R.id.buttonReset).setOnClickListener {
             reset()
         }
-        findViewById<Button>(R.id.buttonA).setOnClickListener {
-            hangman.guess('a', 'á')
-            btnHandler(findViewById(R.id.buttonA))
+        setListener(findViewById<Button>(R.id.buttonA), 'a', 'á')
+        setListener(findViewById(R.id.buttonB), 'b')
+        setListener(findViewById(R.id.buttonC), 'c', 'č')
+        setListener(findViewById(R.id.buttonD), 'd', 'ď')
+        setListener(findViewById(R.id.buttonE), 'e', 'ě', 'é')
+        setListener(findViewById(R.id.buttonF), 'f')
+        setListener(findViewById(R.id.buttonG), 'g')
+        setListener(findViewById(R.id.buttonH), 'h')
+        setListener(findViewById(R.id.buttonI), 'i', 'í')
+        setListener(findViewById(R.id.buttonJ), 'j')
+        setListener(findViewById(R.id.buttonK), 'k')
+        setListener(findViewById(R.id.buttonL), 'l')
+        setListener(findViewById(R.id.buttonM), 'm')
+        setListener(findViewById(R.id.buttonN), 'n', 'ň')
+        setListener(findViewById(R.id.buttonO), 'o', 'ó')
+        setListener(findViewById(R.id.buttonP), 'p')
+        setListener(findViewById(R.id.buttonQ), 'q')
+        setListener(findViewById(R.id.buttonR), 'r', 'ř')
+        setListener(findViewById(R.id.buttonS), 's', 'š')
+        setListener(findViewById(R.id.buttonT), 't', 'ť')
+        setListener(findViewById(R.id.buttonU), 'u', 'ú', 'ů')
+        setListener(findViewById(R.id.buttonV), 'v')
+        setListener(findViewById(R.id.buttonW), 'w')
+        setListener(findViewById(R.id.buttonX), 'x')
+        setListener(findViewById(R.id.buttonY), 'y', 'ý')
+        setListener(findViewById(R.id.buttonZ), 'z', 'ž')
+    }
+
+    private fun setListener(btn: Button, vararg letter: Char) {
+        btn.setOnClickListener {
+            hangman.guess(letter)
+            btnHandler(btn)
         }
-        findViewById<Button>(R.id.buttonB).setOnClickListener {
-            hangman.guess('b')
-            btnHandler(findViewById(R.id.buttonB))
-        }
-        findViewById<Button>(R.id.buttonC).setOnClickListener {
-            hangman.guess('c', 'č')
-            btnHandler(findViewById(R.id.buttonC))
-        }
-        findViewById<Button>(R.id.buttonD).setOnClickListener {
-            hangman.guess('d', 'ď')
-            btnHandler(findViewById(R.id.buttonD))
-        }
-        findViewById<Button>(R.id.buttonE).setOnClickListener {
-            hangman.guess('e', 'ě', 'é')
-            btnHandler(findViewById(R.id.buttonE))
-        }
-        findViewById<Button>(R.id.buttonF).setOnClickListener {
-            hangman.guess('f')
-            btnHandler(findViewById(R.id.buttonF))
-        }
-        findViewById<Button>(R.id.buttonG).setOnClickListener {
-            hangman.guess('g')
-            btnHandler(findViewById(R.id.buttonG))
-        }
-        findViewById<Button>(R.id.buttonH).setOnClickListener {
-            hangman.guess('h')
-            btnHandler(findViewById(R.id.buttonH))
-        }
-        findViewById<Button>(R.id.buttonI).setOnClickListener {
-            hangman.guess('i', 'í')
-            btnHandler(findViewById(R.id.buttonI))
-        }
-        findViewById<Button>(R.id.buttonJ).setOnClickListener {
-            hangman.guess('j')
-            btnHandler(findViewById(R.id.buttonJ))
-        }
-        findViewById<Button>(R.id.buttonK).setOnClickListener {
-            hangman.guess('k')
-            btnHandler(findViewById(R.id.buttonK))
-        }
-        findViewById<Button>(R.id.buttonL).setOnClickListener {
-            hangman.guess('l')
-            btnHandler(findViewById(R.id.buttonL))
-        }
-        findViewById<Button>(R.id.buttonM).setOnClickListener {
-            hangman.guess('m')
-            btnHandler(findViewById(R.id.buttonM))
-        }
-        findViewById<Button>(R.id.buttonN).setOnClickListener {
-            hangman.guess('n', 'ň')
-            btnHandler(findViewById(R.id.buttonN))
-        }
-        findViewById<Button>(R.id.buttonO).setOnClickListener {
-            hangman.guess('o', 'ó')
-            btnHandler(findViewById(R.id.buttonO))
-        }
-        findViewById<Button>(R.id.buttonP).setOnClickListener {
-            hangman.guess('p')
-            btnHandler(findViewById(R.id.buttonP))
-        }
-        findViewById<Button>(R.id.buttonQ).setOnClickListener {
-            hangman.guess('q')
-            btnHandler(findViewById(R.id.buttonQ))
-        }
-        findViewById<Button>(R.id.buttonR).setOnClickListener {
-            hangman.guess('r', 'ř')
-            btnHandler(findViewById(R.id.buttonR))
-        }
-        findViewById<Button>(R.id.buttonS).setOnClickListener {
-            hangman.guess('s', 'š')
-            btnHandler(findViewById(R.id.buttonS))
-        }
-        findViewById<Button>(R.id.buttonT).setOnClickListener {
-            hangman.guess('t', 'ť')
-            btnHandler(findViewById(R.id.buttonT))
-        }
-        findViewById<Button>(R.id.buttonU).setOnClickListener {
-            hangman.guess('u', 'ů', 'ú')
-            btnHandler(findViewById(R.id.buttonU))
-        }
-        findViewById<Button>(R.id.buttonV).setOnClickListener {
-            hangman.guess('v')
-            btnHandler(findViewById(R.id.buttonV))
-        }
-        findViewById<Button>(R.id.buttonW).setOnClickListener {
-            hangman.guess('w')
-            btnHandler(findViewById(R.id.buttonW))
-        }
-        findViewById<Button>(R.id.buttonX).setOnClickListener {
-            hangman.guess('X')
-            btnHandler(findViewById(R.id.buttonX))
-        }
-        findViewById<Button>(R.id.buttonY).setOnClickListener {
-            hangman.guess('y', 'ý')
-            btnHandler(findViewById(R.id.buttonY))
-        }
-        findViewById<Button>(R.id.buttonZ).setOnClickListener {
-            hangman.guess('z', 'ž')
-            btnHandler(findViewById(R.id.buttonZ))
-        }
+    }
+
+    private fun btnHandler(btn: Button) {
+        render(imageViewHangman, textViewWord)
+        btn.isEnabled = false
+        btn.background.alpha = 0
     }
 }

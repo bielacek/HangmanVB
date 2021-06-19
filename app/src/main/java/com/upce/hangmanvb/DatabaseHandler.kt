@@ -3,21 +3,20 @@ package com.upce.hangmanvb
 import android.content.ContentValues
 import android.content.Context
 import android.database.sqlite.SQLiteDatabase
+import android.database.sqlite.SQLiteException
 import android.database.sqlite.SQLiteOpenHelper
-import android.provider.BaseColumns
 import android.widget.Toast
 import androidx.core.content.contentValuesOf
 import androidx.core.database.getStringOrNull
 
-val DATABASE_NAME = "MyDB"
-val TABLE_NAME = "WORDS"
-val COL_WORD = "word"
-val COL_ID = "id"
+const val DATABASE_NAME = "MyDB"
+const val TABLE_NAME = "WORDS"
+const val COL_WORD = "word"
+const val COL_ID = "id"
 
 
 class DatabaseHandler(var context: Context) : SQLiteOpenHelper(context, DATABASE_NAME, null, 1) {
     override fun onCreate(db: SQLiteDatabase?) {
-
         val createTable = "CREATE TABLE " + TABLE_NAME + " (" +
                 COL_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
                 COL_WORD + " VARCHAR(265))"
@@ -25,15 +24,15 @@ class DatabaseHandler(var context: Context) : SQLiteOpenHelper(context, DATABASE
     }
 
     override fun onUpgrade(db: SQLiteDatabase?, oldVersion: Int, newVersion: Int) {
-        TODO("Not yet implemented")
+
     }
 
     fun insertData(word: String) {
         val db = this.writableDatabase
-        var cv = ContentValues()
+        val cv = ContentValues()
         cv.put(COL_WORD, word)
-        var result = db.insert(TABLE_NAME, null, cv)
-        if (result == -1.toLong()) {
+        val result = db.insert(TABLE_NAME, null, cv)
+        if (result == (-1).toLong()) {
             Toast.makeText(context, "Failed", Toast.LENGTH_SHORT).show()
         } else {
             Toast.makeText(context, "Success", Toast.LENGTH_SHORT).show()
@@ -41,14 +40,14 @@ class DatabaseHandler(var context: Context) : SQLiteOpenHelper(context, DATABASE
     }
 
     fun readData(): MutableList<String> {
-        var list: MutableList<String> = ArrayList()
+        val list: MutableList<String> = ArrayList()
         val db = this.readableDatabase
         val query = "SELECT * FROM $TABLE_NAME"
         val result = db.rawQuery(query, null)
         if (result.moveToFirst()) {
             do {
-                var idTemp = result.getString(result.getColumnIndex(COL_ID))
-                var wordTemp = result.getString(result.getColumnIndex(COL_WORD))
+                val idTemp = result.getString(result.getColumnIndex(COL_ID))
+                val wordTemp = result.getString(result.getColumnIndex(COL_WORD))
                 list.add("$idTemp $wordTemp")
             } while (result.moveToNext())
         }
@@ -56,25 +55,38 @@ class DatabaseHandler(var context: Context) : SQLiteOpenHelper(context, DATABASE
         db.close()
         return list
     }
+
     fun getRandom(): String {
         val db = this.readableDatabase
         val query = "SELECT * FROM $TABLE_NAME ORDER BY RANDOM() LIMIT 1"
 
         db.rawQuery(query, null).use {
             if (it.moveToFirst()) {
-                val result = it.getString(it.getColumnIndex(COL_WORD))
-                return result
+                return it.getString(it.getColumnIndex(COL_WORD))
             }
 
         }
-        //var wordTemp = result.getString(result.getColumnIndex(COL_WORD))
-        //var wordTemp = result.getString(result.getColumnIndex(COL_WORD))
 
         db.close()
         return ""
     }
-    fun deleteLast(){
+
+    fun deleteLast() {
         val db = this.readableDatabase
-        db.delete(TABLE_NAME, "$COL_ID = (SELECT MAX($COL_ID) FROM $TABLE_NAME)", null) > 0;
+        db.delete(TABLE_NAME, "$COL_ID = (SELECT MAX($COL_ID) FROM $TABLE_NAME)", null) > 0
+    }
+
+    fun delete(s: String): Int {
+        val db = this.readableDatabase
+        return try {
+            val result = db.delete(TABLE_NAME, "$COL_WORD LIKE '$s'", null)
+            if (result < 1) {
+                db.delete(TABLE_NAME, "$COL_ID=$s", null)
+            } else {
+                result
+            }
+        } catch (e: SQLiteException) {
+            -1
+        }
     }
 }

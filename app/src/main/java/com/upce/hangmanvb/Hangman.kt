@@ -1,23 +1,31 @@
 package com.upce.hangmanvb
 
-class Hangman( var word: String) {
+import java.util.*
+
+class Hangman(var word: String) {
     private val livesMax: Int = 6
     private var guessedArray = BooleanArray(word.length) { _ -> false }
     var lives: Int = livesMax
+
+    init {
+        word = word.toUpperCase(Locale.ROOT).trim().replace("\\s+".toRegex(), " ")
+        revealWhiteSpace()
+    }
 
     /**
      * Resetuje atributy třídy a nahradí původníá slovo za nové
      */
     fun reset(word: String) {
-        this.word = word
+        this.word = word.toUpperCase(Locale.ROOT).trim().replace("\\s+".toRegex(), " ")
         lives = livesMax
         guessedArray = BooleanArray(word.length) { _ -> false }
+        revealWhiteSpace()
     }
 
     /**
      * Hádání písmena/písmen ve slově
      */
-    fun guess(vararg letter: Char) {
+    fun guess(letter: CharArray) {
         var letterGuessed = false
         for (i in word.indices) {
             for (j in letter.indices) {
@@ -56,4 +64,11 @@ class Hangman( var word: String) {
         return text
     }
 
+    private fun revealWhiteSpace() {
+        for (i in word.indices) {
+            if (word[i].isWhitespace()) {
+                guessedArray[i] = true
+            }
+        }
+    }
 }
