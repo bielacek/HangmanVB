@@ -20,6 +20,7 @@ class MainActivity : AppCompatActivity() {
     private val context = this
     private var db = DatabaseHandler(context)
 
+    private val defaultWord = "slovo"
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
@@ -27,7 +28,7 @@ class MainActivity : AppCompatActivity() {
 
         // Tlačítko na odeslání dat do db
         findViewById<Button>(R.id.buttonInsert).setOnClickListener {
-            val text = textViewEdit.text.toString().trim().replace("\\s+".toRegex(), " ")
+            val text = textViewEdit.text.toString().trim().replace("\\s+".toRegex(), " ").replace("[^ěščřžýáíéóúůďťňĎŇŤŠČŘŽÝÁÍÉÚŮa-zA-z]+".toRegex(),"")
             if (text.isNotEmpty() && text.length < 35) {
                 db.delete(text)
                 db.insertData(text)
@@ -67,7 +68,7 @@ class MainActivity : AppCompatActivity() {
         hangman = if (wordtemp.isNotEmpty()) {
             Hangman(wordtemp)
         } else {
-            Hangman("slovo")
+            Hangman(defaultWord)
         }
 
         // Změna barvy textu
@@ -89,6 +90,7 @@ class MainActivity : AppCompatActivity() {
         showData()
     }
 
+    //Zobrazení dat z databáze
     private fun showData() {
         val data = db.readData()
         findViewById<TextView>(R.id.textViewResult).text = ""
@@ -103,8 +105,10 @@ class MainActivity : AppCompatActivity() {
      */
     private fun reset() {
         Toast.makeText(applicationContext, "Hra byla restartována", Toast.LENGTH_SHORT).show()
-        val wordtemp = db.getRandom()
-        if (wordtemp.isNotEmpty()) {
+        var wordtemp = db.getRandom()
+        if (wordtemp.isEmpty()) {
+            wordtemp = defaultWord
+        }
             hangman.reset(wordtemp)
             render(imageViewHangman, textViewWord)
             layoutKeyboard.forEach { child ->
@@ -113,10 +117,6 @@ class MainActivity : AppCompatActivity() {
                     btn.isEnabled = true
                 }
             }
-        } else {
-            Toast.makeText(applicationContext, "Databáze slov je prázdná", Toast.LENGTH_SHORT)
-                .show()
-        }
     }
 
     /**

@@ -8,7 +8,7 @@ class Hangman(var word: String) {
     var lives: Int = livesMax
 
     init {
-        word = word.toUpperCase(Locale.ROOT).trim().replace("\\s+".toRegex(), " ")
+        word = word.toUpperCase(Locale.ROOT).trim().replace("\\s+".toRegex(), " ").replace("[^ěščřžýáíéóúůďťňĎŇŤŠČŘŽÝÁÍÉÚŮa-zA-z]+".toRegex(),"")
         revealWhiteSpace()
     }
 
@@ -16,7 +16,7 @@ class Hangman(var word: String) {
      * Resetuje atributy třídy a nahradí původníá slovo za nové
      */
     fun reset(word: String) {
-        this.word = word.toUpperCase(Locale.ROOT).trim().replace("\\s+".toRegex(), " ")
+        this.word = word.toUpperCase(Locale.ROOT).trim().replace("\\s+".toRegex(), " ").replace("[^ěščřžýáíéóúůďťňĎŇŤŠČŘŽÝÁÍÉÚŮa-zA-z]+".toRegex(),"")
         lives = livesMax
         guessedArray = BooleanArray(word.length) { _ -> false }
         revealWhiteSpace()
